@@ -1,48 +1,12 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
-
-// Datos de ejemplo (luego vendrán de la BD)
-const profesoresEjemplo = [
-  {
-    id_docente: 1,
-    nombre: "Juan",
-    apellidos: "Pérez García",
-    departamento: "Ingeniería de Sistemas",
-    tipo_docente: "nombrado",
-    telefono: "123456789",
-    especialidad: "Inteligencia Artificial",
-    grado_academico: "Doctor",
-    max_horas_sem: 40
-  },
-  {
-    id_docente: 2,
-    nombre: "María",
-    apellidos: "López Hernández",
-    departamento: "Matemáticas",
-    tipo_docente: "contratado",
-    telefono: "987654321",
-    especialidad: "Cálculo Diferencial",
-    grado_academico: "Magister",
-    max_horas_sem: 35
-  },
-  {
-    id_docente: 3,
-    nombre: "Carlos",
-    apellidos: "Rodríguez Silva",
-    departamento: "Física",
-    tipo_docente: "invitado",
-    telefono: "555666777",
-    especialidad: "Física Cuántica",
-    grado_academico: "Doctor",
-    max_horas_sem: 20
-  }
-]
+import { DocentesAPI } from "@/lib/api"
 
 const getTipoBadge = (tipo: string) => {
   const tipos: { [key: string]: string } = {
@@ -54,27 +18,36 @@ const getTipoBadge = (tipo: string) => {
 }
 
 export default function ProfesoresPage() {
+  const [profesores, setProfesores] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
+  useEffect(() => {
+    DocentesAPI.listar()
+      .then((res) => setProfesores(res.items))
+      .catch(() => alert("Error cargando profesores"))
+      .finally(() => setLoading(false))
+  }, [])
+
   const handleDelete = async (id: number, nombre: string) => {
-    if (confirm(`¿Estás seguro de que quieres eliminar al profesor ${nombre}?`)) {
-      setDeletingId(id)
-      try {
-        console.log("Eliminando profesor:", id)
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        alert("Profesor eliminado correctamente")
-        window.location.reload()
-      } catch (error) {
-        console.error("Error al eliminar profesor:", error)
-        alert("Error al eliminar el profesor")
-      } finally {
-        setDeletingId(null)
-      }
+    if (!confirm(`¿Eliminar al profesor ${nombre}?`)) return
+    setDeletingId(id)
+
+    try {
+      await DocentesAPI.eliminar(id)
+      setProfesores(prev => prev.filter(p => p.id_docente !== id))
+    } catch {
+      alert("Error al eliminar profesor")
+    } finally {
+      setDeletingId(null)
     }
   }
 
+  if (loading) return <p className="p-6">Cargando...</p>
+
   return (
     <div className="p-6 space-y-6">
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -98,32 +71,34 @@ export default function ProfesoresPage() {
             <CardTitle className="text-sm font-medium">Total Profesores</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{profesoresEjemplo.length}</div>
+            <div className="text-2xl font-bold">{profesores.length}</div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Nombrados</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {profesoresEjemplo.filter(p => p.tipo_docente === 'nombrado').length}
+              {profesores.filter(p => p.tipo_docente.nombre === 'nombrado').length}
             </div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Contratados</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {profesoresEjemplo.filter(p => p.tipo_docente === 'contratado').length}
+              {profesores.filter(p => p.tipo_docente.nombre === 'contratado').length}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Tabla de Profesores */}
+      {/* Tabla */}
       <Card>
         <CardHeader>
           <CardTitle>Lista de Profesores</CardTitle>
@@ -133,55 +108,62 @@ export default function ProfesoresPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="h-12 px-4 text-left align-middle font-medium">Nombre</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Departamento</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Tipo</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Grado</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Horas Máx.</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Acciones</th>
+                  <th className="h-12 px-4 text-left font-medium">Nombre</th>
+                  <th className="h-12 px-4 text-left font-medium">Departamento</th>
+                  <th className="h-12 px-4 text-left font-medium">Tipo</th>
+                  <th className="h-12 px-4 text-left font-medium">Grado</th>
+                  <th className="h-12 px-4 text-left font-medium">Horas Máx.</th>
+                  <th className="h-12 px-4 text-left font-medium">Acciones</th>
                 </tr>
               </thead>
+
               <tbody>
-                {profesoresEjemplo.map((profesor) => (
-                  <tr key={profesor.id_docente} className="border-b">
-                    <td className="p-4 align-middle">
-                      <div>
-                        <div className="font-medium">{profesor.nombre} {profesor.apellidos}</div>
-                        <div className="text-sm text-muted-foreground">{profesor.especialidad}</div>
-                      </div>
+                {profesores.map((p) => (
+                  <tr key={p.id_docente} className="border-b">
+                    <td className="p-4">
+                      <div className="font-medium">{p.nombre} {p.apellidos}</div>
+                      <div className="text-sm text-muted-foreground">{p.especialidad}</div>
                     </td>
-                    <td className="p-4 align-middle">{profesor.departamento}</td>
-                    <td className="p-4 align-middle">
-                      <Badge variant="secondary" className={getTipoBadge(profesor.tipo_docente)}>
-                        {profesor.tipo_docente}
+
+                    <td className="p-4">{p.departamento.nombre}</td>
+
+                    <td className="p-4">
+                      <Badge variant="secondary" className={getTipoBadge(p.tipo_docente.nombre)}>
+                        {p.tipo_docente.nombre}
                       </Badge>
                     </td>
-                    <td className="p-4 align-middle">{profesor.grado_academico}</td>
-                    <td className="p-4 align-middle">{profesor.max_horas_sem} h/sem</td>
-                    <td className="p-4 align-middle">
+
+                    <td className="p-4">{p.grado_academico}</td>
+
+                    <td className="p-4">{p.max_horas_sem} h/sem</td>
+
+                    <td className="p-4">
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/admin/profesores/${profesor.id_docente}`}>
+                          <Link href={`/admin/profesores/${p.id_docente}`}>
                             <Edit className="h-4 w-4" />
                           </Link>
                         </Button>
-                        <Button 
-                          variant="outline" 
+
+                        <Button
+                          variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(profesor.id_docente, `${profesor.nombre} ${profesor.apellidos}`)}
-                          disabled={deletingId === profesor.id_docente}
+                          onClick={() => handleDelete(p.id_docente, `${p.nombre} ${p.apellidos}`)}
+                          disabled={deletingId === p.id_docente}
                         >
-                          {deletingId === profesor.id_docente ? (
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          {deletingId === p.id_docente ? (
+                            <div className="h-4 w-4 animate-spin border-2 border-current border-t-transparent rounded-full" />
                           ) : (
                             <Trash2 className="h-4 w-4" />
                           )}
                         </Button>
                       </div>
                     </td>
+
                   </tr>
                 ))}
               </tbody>
+
             </table>
           </div>
         </CardContent>

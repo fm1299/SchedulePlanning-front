@@ -1,27 +1,26 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { ProfesorForm } from "../components/profesor-form"
 import { useParams } from "next/navigation"
+import { DocentesAPI } from "@/lib/api"
 
 export default function EditarProfesorPage() {
   const params = useParams()
   const id = params.id as string
 
-  // Datos de ejemplo para edición SIN el campo "estado"
-  const profesorEjemplo = {
-    id_docente: parseInt(id),
-    nombre: "Juan",
-    apellidos: "Pérez García",
-    id_departamento: "1",
-    id_tipo: "2", 
-    telefono: "123456789",
-    especialidad: "Inteligencia Artificial",
-    grado_academico: "Doctor",
-    max_horas_sem: 40
-  }
+  const [profesor, setProfesor] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    DocentesAPI.obtener(Number(id))
+      .then((data) => setProfesor(data))
+      .catch(() => alert("Error cargando profesor"))
+      .finally(() => setLoading(false))
+  }, [id])
 
   return (
     <div className="p-6 space-y-6">
@@ -45,8 +44,9 @@ export default function EditarProfesorPage() {
 
       {/* Formulario */}
       <div className="max-w-2xl">
-        <ProfesorForm profesor={profesorEjemplo} />
+        {loading && <p>Cargando datos...</p>}
+        {profesor && <ProfesorForm profesor={profesor} />}
       </div>
     </div>
   )
-} 
+}
