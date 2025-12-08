@@ -22,7 +22,7 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
 export const ReservaAPI = {
   getAll: () => apiRequest("/reservas/"),
 
-  // ⭐⭐⭐ AGREGAR ESTE
+
   getById: (id: number) => apiRequest(`/reservas/${id}`),
 
   create: (body: any) =>
