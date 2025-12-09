@@ -42,7 +42,7 @@ export function ProfesorForm({ profesor }: { profesor?: any }) {
         max_horas_sem: profesor.max_horas_sem || 40,
 
         // CORRECCIÓN: extraer el ID REAL
-        id_departamento: profesor.departamento.id_departamento.toString(),
+        //id_departamento: profesor.departamento.id_departamento.toString(),
         id_tipo: profesor.tipo_docente.id_tipo.toString(),
       })
     }
@@ -51,7 +51,7 @@ export function ProfesorForm({ profesor }: { profesor?: any }) {
   const [formData, setFormData] = useState({
     nombre: "",
     apellidos: "",
-    id_departamento: "",
+    //id_departamento: "",
     id_tipo: "",
     telefono: "",
     especialidad: "",
@@ -81,7 +81,7 @@ export function ProfesorForm({ profesor }: { profesor?: any }) {
       grado_academico: formData.grado_academico,
 
       // CORRECCIÓN: convertir a ENTEROS
-      id_departamento: Number(formData.id_departamento),
+      //id_departamento: Number(formData.id_departamento),
       id_tipo: Number(formData.id_tipo),
       max_horas_sem: Number(formData.max_horas_sem),
     }
@@ -147,7 +147,7 @@ export function ProfesorForm({ profesor }: { profesor?: any }) {
               <div className="space-y-2">
                 <Label>Departamento *</Label>
                 <Select
-                  value={formData.id_departamento}
+                  //value={formData.id_departamento}
                   onValueChange={(v) => handleChange("id_departamento", v)}
                 >
                   <SelectTrigger>

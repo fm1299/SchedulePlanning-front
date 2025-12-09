@@ -109,7 +109,7 @@ export default function ProfesoresPage() {
               <thead>
                 <tr className="border-b bg-muted/50">
                   <th className="h-12 px-4 text-left font-medium">Nombre</th>
-                  <th className="h-12 px-4 text-left font-medium">Departamento</th>
+                  {/*<th className="h-12 px-4 text-left font-medium">Departamento</th>*/}
                   <th className="h-12 px-4 text-left font-medium">Tipo</th>
                   <th className="h-12 px-4 text-left font-medium">Grado</th>
                   <th className="h-12 px-4 text-left font-medium">Horas Máx.</th>
@@ -125,8 +125,9 @@ export default function ProfesoresPage() {
                       <div className="text-sm text-muted-foreground">{p.especialidad}</div>
                     </td>
 
-                    <td className="p-4">{p.departamento.nombre}</td>
-
+                   {/*
+  <td className="p-4">{p.departamento.nombre}</td>
+*/}
                     <td className="p-4">
                       <Badge variant="secondary" className={getTipoBadge(p.tipo_docente.nombre)}>
                         {p.tipo_docente.nombre}
