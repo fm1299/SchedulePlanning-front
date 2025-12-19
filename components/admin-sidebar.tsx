@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter, usePathname } from "next/navigation"
-import { LayoutDashboard, Building, Calendar, BookOpen, BarChart3, LogOut, GraduationCap } from "lucide-react"
+import { LayoutDashboard, Building, Calendar, BookOpen, BarChart3, LogOut, GraduationCap, Users } from "lucide-react"
 
 const adminNavItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
@@ -12,6 +12,8 @@ const adminNavItems = [
   { href: "/admin/horario", icon: Calendar, label: "Horarios" },
   { href: "/admin/reservas", icon: BookOpen, label: "Reservas" },
   { href: "/admin/reportes", icon: BarChart3, label: "Reportes" },
+  // NUEVO ITEM AGREGADO 
+  { href: "/admin/profesores", icon: Users, label: "Profesores" },
 ]
 
 export function AdminSidebar() {
