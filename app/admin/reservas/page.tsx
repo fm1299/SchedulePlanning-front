@@ -305,7 +305,7 @@ export default function ReservasPage() {
                       className="bg-red-600 hover:bg-red-700 text-white shadow-sm"
                       onClick={() => askDelete(r.id)}
                     >
-                      Eliminar
+                      Cancelar
                     </Button>
                   </TableCell>
                 </TableRow>
