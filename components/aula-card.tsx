@@ -1,4 +1,5 @@
-// components/aula-card.tsx
+'use client';
+
 import { AulaStatusBadge } from '@/components/aula-status-badge';
 import { updateAulaStatus } from '@/lib/aula-api';
 import type { Aula } from '@/lib/aula-api';
@@ -9,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 interface AulaCardProps {
   aula: Aula;
@@ -16,7 +18,7 @@ interface AulaCardProps {
 }
 
 export function AulaCard({ aula, onStatusChange }: AulaCardProps) {
-  const getTipoIcon = (tipo: Aula['tipo']) => {
+  const getTipoIcon = (tipo: string) => {
     switch (tipo) {
       case 'Laboratorio':
         return <Building className="w-4 h-4" />;
@@ -33,6 +35,18 @@ export function AulaCard({ aula, onStatusChange }: AulaCardProps) {
       onStatusChange();
     } catch (error) {
       console.error('Error al actualizar estado:', error);
+      alert('Error al actualizar el estado del aula');
+    }
+  };
+
+  const getTipoColor = (tipo: string) => {
+    switch (tipo) {
+      case 'Laboratorio':
+        return 'bg-purple-50 text-purple-600';
+      case 'Oficina':
+        return 'bg-green-50 text-green-600';
+      default:
+        return 'bg-blue-50 text-blue-600';
     }
   };
 
@@ -45,7 +59,7 @@ export function AulaCard({ aula, onStatusChange }: AulaCardProps) {
             <h3 className="font-semibold text-lg text-gray-800">{aula.nombre}</h3>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md">
+            <span className={`px-2 py-1 rounded-md ${getTipoColor(aula.tipo)}`}>
               {aula.numero}
             </span>
             <span>{aula.tipo}</span>
@@ -56,11 +70,11 @@ export function AulaCard({ aula, onStatusChange }: AulaCardProps) {
           <AulaStatusBadge status={aula.status} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="p-1 hover:bg-gray-100 rounded">
-                <MoreVertical className="w-4 h-4 text-gray-500" />
-              </button>
+              <Button variant="ghost" size="sm" className="p-1 h-8 w-8">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleStatusChange('available')}>
                 Marcar como Disponible
               </DropdownMenuItem>
@@ -80,6 +94,12 @@ export function AulaCard({ aula, onStatusChange }: AulaCardProps) {
           <Users className="w-4 h-4" />
           <span>{aula.capacidad} personas</span>
         </div>
+        
+        {aula.ubicacion && (
+          <div className="text-sm text-gray-600">
+            📍 {aula.ubicacion}
+          </div>
+        )}
         
         <p className="text-gray-600 text-sm">
           {aula.descripcion || 'Sin descripción'}
