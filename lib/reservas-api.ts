@@ -1,3 +1,4 @@
+// lib/reservas-api.ts
 const API_URL = "http://localhost:8000/api/v1";
 
 async function apiRequest(endpoint: string, options: RequestInit = {}) {
@@ -22,8 +23,11 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
 export const ReservaAPI = {
   getAll: () => apiRequest("/reservas/"),
 
-
   getById: (id: number) => apiRequest(`/reservas/${id}`),
+
+  // Reservas por docente
+  getByDocente: (idDocente: string | number) =>
+    apiRequest(`/reservas/docente/${idDocente}`),
 
   create: (body: any) =>
     apiRequest("/reservas/", {
